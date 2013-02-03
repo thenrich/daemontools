@@ -1,0 +1,13 @@
+#!/bin/bash
+NAME=$1
+
+if [ $NAME ]; then
+	if [ -d /service/$NAME ]; then
+		echo "$NAME already exists"
+		exit
+	fi
+	mkdir -p /service/$NAME/log	
+	echo -e "#!/bin/sh\nexec multilog t ./main" > /service/$NAME/log/run
+	echo -e "#!/bin/sh\nexec 2>&1\nexec echo \"running...\"" > /service/$NAME/run
+	chmod +x /service/$NAME/log/run /service/$NAME/run
+fi

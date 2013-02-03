@@ -1,0 +1,18 @@
+#!/bin/bash
+
+if [ -d /package ]; then
+	echo "/package already exists, exiting"
+	exit
+fi
+
+mkdir -p /package/
+chmod 1755 /package
+
+if [ ! -d admin ]; then
+	echo "admin directory not here, exiting"
+	exit
+fi
+
+mv admin /package/
+cd /package/admin/daemontools-0.76
+package/install
