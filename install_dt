@@ -13,6 +13,6 @@ if [ ! -d admin ]; then
 	exit
 fi
 
-mv admin /package/
+cp -a admin /package/
 cd /package/admin/daemontools-0.76
 package/install
