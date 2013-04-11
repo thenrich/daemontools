@@ -1,13 +1,50 @@
 #!/bin/bash
-NAME=$1
+SERVICE_DIR=$1
+NAME=$2
+RUN_SCRIPT=$3
+LOG_SCRIPT=$4
+
+SVC_DIR=/service
+
+echo $SERVICE_DIR
+echo $NAME
+echo $RUN_SCRIPT
+echo $LOG_SCRIPT
+
+if [ $SERVICE_DIR = "/service" ]; then
+	echo "Service dir can't be /service"
+	exit
+fi
 
 if [ $NAME ]; then
-	if [ -d /service/$NAME ]; then
-		echo "$NAME already exists"
-		exit
+	if [ ! -d $SERVICE_DIR/$NAME ]; then
+		mkdir -p $SERVICE_DIR/$NAME/log
+		ln -s $SERVICE_DIR/$NAME $SVC_DIR/$NAME
 	fi
-	mkdir -p /service/$NAME/log	
-	echo -e "#!/bin/sh\nexec multilog t ./main" > /service/$NAME/log/run
-	echo -e "#!/bin/sh\nexec 2>&1\nexec echo \"running...\"" > /service/$NAME/run
-	chmod +x /service/$NAME/log/run /service/$NAME/run
+	
+	if [ -z "$LOG_SCRIPT" ]; then
+		# Create default log script if not provided
+		echo -e "#!/bin/sh\nexec multilog t ./main" > $SERVICE_DIR/$NAME/log/run
+	else
+		cp $LOG_SCRIPT $SERVICE_DIR/$NAME/log/run
+		chmod +x $SERVICE_DIR/$NAME/log/run
+	fi	
+
+	if [ ! -z "$RUN_SCRIPT" ]; then 
+		cp $RUN_SCRIPT $SERVICE_DIR/$NAME/run
+		chmod +x $SERVICE_DIR/$NAME/log/run $SERVICE_DIR/$NAME/run
+	fi
+
+	if [ -e "$SVC_DIR/$NAME" ]; then	
+		#wait for supervise directories to exist
+		while [ ! -s $SVC_DIR/$NAME/supervise ]
+		  do
+		  echo "waiting for supervise directory to be created"
+		  sleep 1
+		done
+		svc -k $SVC_DIR/$NAME
+		svc -t $SVC_DIR/$NAME/log
+	fi
+
+	
 fi
