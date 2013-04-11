@@ -19,6 +19,8 @@ fi
 if [ $NAME ]; then
 	if [ ! -d $SERVICE_DIR/$NAME ]; then
 		mkdir -p $SERVICE_DIR/$NAME/log
+		mkdir $SERVICE_DIR/$NAME/.env
+		echo "/root/.deploy" > $SERVICE_DIR/$NAME/.env/DEPLOY_ROOT
 		ln -s $SERVICE_DIR/$NAME $SVC_DIR/$NAME
 	fi
 	
