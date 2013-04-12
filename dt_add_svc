@@ -6,6 +6,25 @@ LOG_SCRIPT=$4
 
 SVC_DIR=/service
 
+
+function abspath {
+	if [[ -d "$1" ]]
+	then
+		pushd "$1" >/dev/null
+		pwd
+		popd >/dev/null
+	elif [[ -e $1 ]]
+	then
+		pushd $(dirname $1) >/dev/null
+		echo $(pwd)/$(basename $1)
+		popd >/dev/null
+	else
+		echo $1 does not exist! >&2
+		return 127
+	fi
+}
+
+
 echo $SERVICE_DIR
 echo $NAME
 echo $RUN_SCRIPT
@@ -21,7 +40,8 @@ if [ $NAME ]; then
 		mkdir -p $SERVICE_DIR/$NAME/log
 		mkdir $SERVICE_DIR/$NAME/.env
 		echo "/root/.deploy" > $SERVICE_DIR/$NAME/.env/DEPLOY_ROOT
-		ln -s $SERVICE_DIR/$NAME $SVC_DIR/$NAME
+		SYMLINK_PATH=`abspath $SERVICE_DIR/$NAME`
+		ln -s $SYMLINK_PATH $SVC_DIR/$NAME
 	fi
 	
 	if [ -z "$LOG_SCRIPT" ]; then
