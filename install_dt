@@ -1,4 +1,6 @@
 #!/bin/bash
+SCRIPT_NAME=`basename $0`
+BASEDIR=${0/$SCRIPT_NAME/}
 
 if [ -d /package ]; then
 	echo "/package already exists, exiting"
@@ -8,11 +10,12 @@ fi
 mkdir -p /package/
 chmod 1755 /package
 
-if [ ! -d admin ]; then
+if [ ! -d $BASEDIR/admin ]; then
 	echo "admin directory not here, exiting"
 	exit
 fi
 
-cp -a admin /package/
+echo $BASEDIR/admin
+cp -a $BASEDIR/admin /package/
 cd /package/admin/daemontools-0.76
 package/install
